@@ -20,10 +20,12 @@ function selectActiveWorkspaceSurfaceKey(s: AppState): string {
 // Why: a surface change is navigation unless the previous tab is gone — a
 // pty-exit close re-selects a neighbor, or deactivates an emptied worktree, with no user input.
 function isUserNavigation(s: AppState, from: WorkspaceSurface): boolean {
-  if (!from.tabId) {
+  const groups = s.groupsByWorktree[from.worktreeId]
+  // Why: deleting a worktree drops its groups entry; a pty exit leaves it in place.
+  if (!from.tabId || !groups) {
     return true
   }
-  return (s.groupsByWorktree[from.worktreeId] ?? []).some((g) => g.tabOrder.includes(from.tabId))
+  return groups.some((g) => g.tabOrder.includes(from.tabId))
 }
 
 type AgentDashboardSidebarHostProps = {

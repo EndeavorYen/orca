@@ -182,6 +182,28 @@ describe('AgentDashboardSidebarHost', () => {
     expect(useAppStore.getState().agentDashboardDrawerOpen).toBe(true)
   })
 
+  it('yields when the active worktree is deleted', async () => {
+    useAppStore.setState({
+      activeWorktreeId: 'wt-a',
+      activeGroupIdByWorktree: { 'wt-a': 'group-1' },
+      groupsByWorktree: {
+        'wt-a': [{ id: 'group-1', worktreeId: 'wt-a', activeTabId: 'tab-1', tabOrder: ['tab-1'] }]
+      }
+    })
+    renderHost()
+    act(() => useAppStore.setState({ agentDashboardDrawerOpen: true }))
+
+    act(() =>
+      useAppStore.setState({
+        activeWorktreeId: null,
+        activeGroupIdByWorktree: {},
+        groupsByWorktree: {}
+      })
+    )
+
+    await waitFor(() => expect(useAppStore.getState().agentDashboardDrawerOpen).toBe(false))
+  })
+
   it('yields when the user leaves a worktree whose tab is still open', async () => {
     useAppStore.setState({
       activeWorktreeId: 'wt-a',
