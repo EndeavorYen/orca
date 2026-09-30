@@ -18,9 +18,9 @@ function selectActiveWorkspaceSurfaceKey(s: AppState): string {
 }
 
 // Why: a surface change is navigation unless the previous tab is gone — a
-// pty-exit close re-selects a neighbor with no user input.
-function isUserNavigation(s: AppState, from: WorkspaceSurface, to: WorkspaceSurface): boolean {
-  if (from.worktreeId !== to.worktreeId || !from.tabId) {
+// pty-exit close re-selects a neighbor, or deactivates an emptied worktree, with no user input.
+function isUserNavigation(s: AppState, from: WorkspaceSurface): boolean {
+  if (!from.tabId) {
     return true
   }
   return (s.groupsByWorktree[from.worktreeId] ?? []).some((g) => g.tabOrder.includes(from.tabId))
@@ -78,7 +78,7 @@ export default function AgentDashboardSidebarHost({
     if (last.key === surfaceKey || !last.surface) {
       return
     }
-    if (drawerOpen && isUserNavigation(state, last.surface, surface)) {
+    if (drawerOpen && isUserNavigation(state, last.surface)) {
       setDrawerOpen(false)
     }
   }, [drawerOpen, setDrawerOpen, surfaceKey])
